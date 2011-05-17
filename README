@@ -1,0 +1,3 @@
+Haskell MapReduce monad
+
+This is a monadic implementation of MapReduce for use on a single machine.  It does parallelise across all available processors.
