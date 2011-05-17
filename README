@@ -41,10 +41,11 @@ The package contains:
 To build, download from https://github.com/Julianporter/Haskell-MapReduce, 
 expand it and then cd to top-level directory.  On the command line type:
 
-cabal install
+runhaskell Setup install
 
 Cabal will the proceed to build the library, add it to your installation and 
-create Haddock documentation.
+create Haddock documentation for the modules Remote.Common.Hashable and 
+Remote.Multicore.MapReduce.
 
 FOR MORE INFORMATION
 
