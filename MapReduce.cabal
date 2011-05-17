@@ -1,0 +1,56 @@
+Name: MapReduce
+Version: 0.1.1
+Copyright: (c) 2011, Julian Porter
+License: BSD3
+License-File: LICENSE
+Author: Julian Porter
+Maintainer: 
+Cabal-Version: >= 1.2.3
+Stability: provisional
+Synopsis: A framework for MapReduce on multicore systems
+Description:
+{-
+Library that defines the 'MapReduce' monad for multicore systems, and exports 
+the necessary functions.
+
+Mapper / reducers are generalised to functions of type 
+@a -> ([(s,a)] -> [(s',b)])@ which are combined using the monad's bind 
+operation.  The resulting monad is executed on initial data by invoking
+'runMapReduce'.
+
+For programmers only wishing to write conventional map / reduce algorithms,
+which use functions of type @([s] -> [(s',b)])@ a wrapper function
+'wrapMR' is provided, which converts such a function into the
+appropriate monadic function.
+-}
+Category: Distributed Computing
+Build-Type: Simple
+Tested-With: GHC ==6.10 && ==7.0.3
+Extra-source-files:
+
+Library
+  Build-Depends: base >=4,
+                 haskell98, 
+                 deepseq,
+                 parallel,
+                 bytestring,
+                 cryptohash
+  GHC-Options: -O2
+  Hs-Source-Dirs: src
+  Exposed-Modules: Process.MapReduce.Multicore, 
+                   Process.Common.Hashable
+  Exposed: True
+  Other-Modules: Process.Common.ParallelMap
+
+  Extensions: TypeSynonymInstances,
+              MultiParamTypeClasses, 
+              FunctionalDependencies, 
+              FlexibleInstances
+
+Executable wordcount
+  Main-Is:        Main.hs
+  Other modules:  Process.MapReduce.Multicore
+  Build-Depends:  base >=4, 
+                  haskell98
+  GHC-Options: -threaded -O2
+  Hs-Source-Dirs: src
