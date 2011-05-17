@@ -1,3 +1,42 @@
-Haskell MapReduce monad
+HASKELL MAPREDUCE LIBRARY
 
-This is a monadic implementation of MapReduce for use on a single machine.  It does parallelise across all available processors.
+This is an implementation of MapReduce for use on a single machine.  It will automatically parallelise into multiple threads running on all available processors.
+
+The key idea is that map and reduce stages can just be treated as functions of type
+
+[s] -> [(s',a)]
+
+where s is the input data type, s' is the output data type and a is the output key type.  The package providers a wrapper function liftMR that converts the map / reduce function into a monadic function, so building a processing chain is simply a matter of setting out
+
+liftMR map1 >>= liftMR reduce1 >>= liftMR map2 >>= liftMR reduce2 >>= . . .
+
+Then existing utility functions allow one to evaluate the processing chain on specified initial data.
+
+Key points are:
+
+(1) From the point of view of the applications programmer MapReduce is totally
+    transparent; mappers and reducers can be written as simple functions; the
+    wrapper function and the monad do all the work of distributing work across
+    mappers / reducers, sorting the output based on key value, etc.
+(2) Writing a MapReduce function reduces to writing the mappers / reducers and
+    the providing fewer than ten lines of boilerplate code.
+(3) The fact that the distinction between mappers and reducers is eliminate     
+    makes it possible to produce processing chains more general than those 
+    permitted by more traditional MapReduce frameworks, such as HADOOP.
+
+THE PACKAGE
+
+The package contains:
+
+(1) Full source code for the libray with Haddock documentation.
+(2) A Cabal file to build the library and generate documentation.
+
+To build, download from https://github.com/Julianporter/Haskell-MapReduce, expand it and then cd to top-level directory.  On the command line type:
+
+cabal install
+
+Cabal will the proceed to build the library, add it to your installation and create Haddock documentation.
+
+FOR MORE INFORMATION
+
+Project website: http://blog.jpembeddedsolutions.com/MapReduce
