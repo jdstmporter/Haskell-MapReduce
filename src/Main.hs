@@ -14,22 +14,31 @@ import System.Environment (getArgs)
 import Prelude hiding (return,(>>=))
 import qualified Prelude as P
 
+showNice :: [(String,Int)] -> IO()
+showNice [] = P.return ()
+showNice (x:xs) = do
+        putStrLn $ (fst x)++" occurs "++(show $ snd x)++" times"
+        showNice xs 
 
+countWords :: [(String,Int)] -> Int
+countWords [] = 0
+countWords (x:xs) = snd x + countWords xs 
 
 main::IO()
 main = do
         args <- getArgs
         out <- case (length args) of 
                 0 -> do
-                        P.return "Usage: wordcount [filename] ([num mappers])"
+                        error "Usage: wordcount [filename] ([num mappers])"
                 _ -> do
                         state <- getLines (args!!0)
                         let nMap = case (length args) of
                                 1 -> 16
                                 _ -> read $ args!!1
                         let res = mapReduce nMap state
-                        P.return $ show res
-        putStrLn out
+                        P.return res
+        showNice out
+        putStrLn $ show (countWords out)
 
 -- perform MapReduce
 

@@ -27,9 +27,10 @@ import Control.Monad (liftM)
 import Control.DeepSeq (NFData)
 import IO
 import Prelude hiding (return,(>>=))
-import Process.Common.Hashable (Hashable,hash)
 import qualified Process.Common.ParallelMap as P
-
+import Data.Digest.Pure.MD5
+import Data.Binary
+import qualified Data.ByteString.Lazy as B
 
 -- | Generalised version of 'Monad' which depends on a pair of 'Tuple's, both
 --   of which change when '>>=' is applied.           
@@ -97,12 +98,18 @@ runMapReduce :: MapReduce s () s' b     -- ^ 'MapReduce' representing the requir
                                                       
 runMapReduce m ss = (runMR m) [(s,()) | s <- ss]
 
+-- | The hash function.  Computes the MD5 hash of any 'Hashable' type
+hash :: (Binary s) => s -> Int -- ^ computes the hash
+hash s = sum $ map fromIntegral (B.unpack h) 
+        where
+        h = encode $ show (md5 $ encode s)
+
 -- | Function used at the start of processing to determine how many threads of processing
 --   to use.  Should be used as the starting point for building a 'MapReduce'.
 --   Therefore a generic 'MapReduce' should look like
 --
 --   @distributeMR >>= f1 >>= . . . >>= fn@
-distributeMR :: (Hashable s) => Int     -- ^ Number of threads across which to distribute initial data 
+distributeMR :: (Binary s) => Int     -- ^ Number of threads across which to distribute initial data 
                 -> MapReduce s () s Int -- ^ The 'MapReduce' required to do this  
 distributeMR n = MR (\ss -> [(s,hash s `mod` n) | s <- fst <$> ss])
 
