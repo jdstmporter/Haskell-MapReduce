@@ -9,7 +9,7 @@
 module Main where
 
 import Process.MapReduce.Multicore
-import IO
+import System.IO
 import System.Environment (getArgs)
 import Prelude hiding (return,(>>=))
 import qualified Prelude as P
@@ -17,28 +17,26 @@ import qualified Prelude as P
 showNice :: [(String,Int)] -> IO()
 showNice [] = P.return ()
 showNice (x:xs) = do
-        putStrLn $ (fst x)++" occurs "++(show $ snd x)++" times"
+        putStrLn $ fst x ++ " occurs "++ show ( snd x) ++ " times"
         showNice xs 
 
 countWords :: [(String,Int)] -> Int
-countWords [] = 0
-countWords (x:xs) = snd x + countWords xs 
+countWords = foldr ((+).snd) 0  
 
 main::IO()
 main = do
         args <- getArgs
-        out <- case (length args) of 
-                0 -> do
-                        error "Usage: wordcount [filename] ([num mappers])"
+        out <- case length args of 
+                0 -> error "Usage: wordcount [filename] ([num mappers])"
                 _ -> do
-                        state <- getLines (args!!0)
-                        let nMap = case (length args) of
+                        state <- getLines (head args)
+                        let nMap = case length args of
                                 1 -> 16
                                 _ -> read $ args!!1
                         let res = mapReduce nMap state
                         P.return res
         showNice out
-        putStrLn $ show (countWords out)
+        print (countWords out)
 
 -- perform MapReduce
 

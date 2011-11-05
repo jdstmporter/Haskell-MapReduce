@@ -40,7 +40,7 @@ class Monad2 m a b where
         (>>=)  :: m a b -> (b -> m b c) -> m a c 
         -- | bind that throws away the output of the first argument
         (>>) :: m a b -> m b c -> m a c
-        (>>) x y = x >>= (\ v -> y)
+        (>>) x y = x >>= const y
 
 -- | The generalised monad transformer; takes a 'Monad' and produces a 'Monad2'.
 class MonadTrans2 t where

@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
 
 -- | Module that defines the 'MapReduce' monad and exports the necessary functions.
 --
@@ -25,7 +25,7 @@ import Data.List (nub)
 import Control.Applicative ((<$>))
 import Control.Monad (liftM)
 import Control.DeepSeq (NFData)
-import IO
+import System.IO
 import Prelude hiding (return,(>>=))
 import qualified Process.Common.ParallelMap as P
 import Data.Digest.Pure.MD5
@@ -59,7 +59,7 @@ class MonadG m where
 --  @[(s',b)]@ where @s@ and @s'@ are data types and @a@, @b@ are key types.
 --
 --  Its structure is intentionally opaque to application programmers.
-newtype MapReduce s a s' b = MR { runMR :: ([(s,a)] -> [(s',b)]) }
+newtype MapReduce s a s' b = MR { runMR :: [(s,a)] -> [(s',b)] }
 
 instance MonadG MapReduce where
         return = retMR
@@ -85,7 +85,7 @@ bindMR f g = MR (\s ->
                 fs = runMR f s
                 gs = map g $ nub $ snd <$> fs
         in
-        concat $ P.map (\g' -> runMR g' fs) gs)
+        concat $ P.map (`runMR` fs) gs)
 
 -- | Execute a MapReduce MonadG given specified initial data.  Therefore, given
 --   a 'MapReduce' @m@ and initial data @xs@ we apply the processing represented
@@ -96,7 +96,7 @@ runMapReduce :: MapReduce s () s' b     -- ^ 'MapReduce' representing the requir
                 -> [s]                  -- ^ Initial data
                 -> [(s',b)]             -- ^ Result of applying the processing to the data
                                                       
-runMapReduce m ss = (runMR m) [(s,()) | s <- ss]
+runMapReduce m ss = runMR m [(s,()) | s <- ss]
 
 -- | The hash function.  Computes the MD5 hash of any 'Hashable' type
 hash :: (Binary s) => s -> Int -- ^ computes the hash
@@ -124,9 +124,9 @@ distributeMR n = MR (\ss -> [(s,hash s `mod` n) | s <- fst <$> ss])
 --   @distributeMR >>= liftMR f1 >>= . . . >>= liftMR fn@  
 liftMR :: (Eq a) => ([s] -> [(s',b)])   -- traditional mapper / reducer of signature
                                         --  @([s] -> [(s',b])@
-        -> (a -> MapReduce s a s' b)    -- the mapper / reducer wrapped as an instance
+        -> a -> MapReduce s a s' b      -- the mapper / reducer wrapped as an instance
                                         -- of 'MapReduce'
-liftMR f = (\k -> MR (g k))
+liftMR f = MR . g
         where
         g k ss = f $ fst <$> filter (\s -> k == snd s) ss
 

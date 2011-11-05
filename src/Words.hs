@@ -1,7 +1,7 @@
 module Main where
 
 import System.Environment (getArgs)
-import IO
+import System.IO
 import System.Random (getStdRandom,randomR)
 
 dictionary :: String
@@ -12,7 +12,7 @@ main = do
         args <- getArgs
         (file,text) <- case length args of
                 3 -> do
-                        let n    = read $ args!!0
+                        let n    = read $ head args
                             m    = read $ args!!1
                             file = args!!2
                         words <- getWords m dictionary
@@ -34,8 +34,7 @@ makeText words n m = do
         
 getRand:: Int -> Int -> Int -> IO [Int]
 getRand min max n
-        | n <=0 = do
-               return []
+        | n <=0 = return []
         | otherwise = do
                 xs <- getRand min max (n-1)
                 x <- getStdRandom (randomR (min,max))
