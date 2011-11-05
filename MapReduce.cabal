@@ -1,5 +1,5 @@
 Name: MapReduce
-Version: 0.1.1
+Version: 0.2
 Copyright: (c) 2011, Julian Porter
 License: BSD3
 License-File: LICENSE
@@ -27,30 +27,33 @@ Category: Distributed Computing
 Build-Type: Simple
 Tested-With: GHC ==6.10 && ==7.0.3
 Extra-source-files:
+other-modules: Control.Monad2
 
 Library
   Build-Depends: base >=4,
-                 haskell98, 
-                 deepseq,
-                 parallel,
-                 bytestring,
-                 cryptohash
+                 haskell98, deepseq, parallel, bytestring, transformers, pureMD5, ghc-binary
   GHC-Options: -O2
   Hs-Source-Dirs: src
   Exposed-Modules: Process.MapReduce.Multicore, 
-                   Process.Common.Hashable
+                   Control.Monad2,Control.Monad2.Trans.MapReduce
   Exposed: True
   Other-Modules: Process.Common.ParallelMap
 
-  Extensions: TypeSynonymInstances,
-              MultiParamTypeClasses, 
-              FunctionalDependencies, 
-              FlexibleInstances
+  Extensions: TypeSynonymInstances,MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances
+
 
 Executable wordcount
   Main-Is:        Main.hs
   Other modules:  Process.MapReduce.Multicore
-  Build-Depends:  base >=4, 
-                  haskell98
+  Build-Depends:  base >=4, haskell98
   GHC-Options: -threaded -O2
   Hs-Source-Dirs: src
+
+Executable wordgen
+  Main-Is:        Words.hs
+  Build-Depends:  base >=4, 
+                  haskell98, random
+  GHC-Options: -threaded -O2
+  Hs-Source-Dirs: src
+
+
