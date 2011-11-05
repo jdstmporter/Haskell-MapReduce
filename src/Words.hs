@@ -27,7 +27,9 @@ main = do
 makeText :: [String] -> Int -> Int -> IO [String] 
 makeText words n m = do 
         is <- getRand 0 (m-1) n
+        -- putStrLn $ "Got "++(show $ length is)++" numbers"
         let ws = map (\i -> words!!i) is
+        -- putStrLn $ "Got "++(show $ length ws)++" words"
         return ws
         
 getRand:: Int -> Int -> Int -> IO [Int]
@@ -50,4 +52,5 @@ putLines :: FilePath -> [String] -> IO ()
 putLines file text = do
         h <- openFile file WriteMode
         hPutStr h $ unlines text
+        hClose h
         return () 
