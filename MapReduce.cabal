@@ -27,7 +27,7 @@ Category: Distributed Computing
 Build-Type: Simple
 Tested-With: GHC ==6.10 && ==7.0.3
 Extra-source-files:
-other-modules: Control.Monad2
+other-modules: Control.Monad2, MRCode
 
 Library
   Build-Depends: base >=4,
@@ -48,12 +48,14 @@ Executable wordcount
   Build-Depends:  base >=4, haskell98
   GHC-Options: -threaded -O2
   Hs-Source-Dirs: src
+  other-modules:  MRCode
 
 Executable wordgen
   Main-Is:        Words.hs
   Build-Depends:  base >=4, 
-                  haskell98, random
+                  haskell98, QuickCheck
   GHC-Options: -threaded -O2
   Hs-Source-Dirs: src
+  other-modules:  MRCode
 
 
