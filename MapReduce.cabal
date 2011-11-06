@@ -25,7 +25,7 @@ appropriate monadic function.
 -}
 Category: Distributed Computing
 Build-Type: Simple
-Tested-With: GHC==6.10, GHC==7.0.3
+Tested-With: GHC==6.10, GHC==7.0.3, GHC==7.2.1
 
 source-repository head
   type:     git
@@ -33,7 +33,7 @@ source-repository head
 
 Library
   Build-Depends: base >=4  && <5,
-                 haskell98, deepseq, parallel, bytestring, transformers, pureMD5, ghc-binary
+                 deepseq, parallel, bytestring, transformers, pureMD5, binary
   GHC-Options: 
   Hs-Source-Dirs: src
   Exposed-Modules: Process.MapReduce.Multicore, 
@@ -50,7 +50,7 @@ Library
 Executable wordcount
   Main-Is:        WordCount.hs
   Other modules:  Process.MapReduce.Multicore
-  Build-Depends:  base >=4 && <5, haskell98
+  Build-Depends:  base >=4 && <5
   GHC-Options: -threaded
   Hs-Source-Dirs: src
   other-modules:  Process.MapReduce.WordCount, 
@@ -59,7 +59,7 @@ Executable wordcount
 
 Executable testwordcount
   Main-Is:        Main.hs
-  Build-Depends:  base >=4 && <5, haskell98, QuickCheck
+  Build-Depends:  base >=4 && <5, QuickCheck
   GHC-Options: -threaded
   Hs-Source-Dirs: src
   other-modules:  Process.MapReduce.WordCount,
