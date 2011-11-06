@@ -35,17 +35,27 @@ THE PACKAGE
 
 The package contains:
 
-(1) Full source code for the libray with Haddock documentation.
+(1) Full source code for the library, with Haddock documentation.
 (2) A Cabal file to build the library and generate documentation.
 
-To build, download from https://github.com/Julianporter/Haskell-MapReduce, 
-expand it and then cd to top-level directory.  On the command line type:
+To build the library and applications:
 
-runhaskell Setup install
+    mkdir MR
+    cd MR
+    git clone git://github.com/Julianporter/Haskell-MapReduce.git
+    cd Haskell-MapReduce 
+    cabal install
 
 Cabal will the proceed to build the library, add it to your installation and 
-create Haddock documentation for the modules Remote.Common.Hashable and 
-Remote.Multicore.MapReduce.
+create Haddock documentation.  As well as the library, it will install two
+applications:
+
+(1) 'wordcount' : this does a simple word count on a supplied file of space-
+    separated words and prints the result.
+(2) 'testwordcount' : this applies automated tests using the word count
+    algorithm, using the QuickCheck testing framework.  The maximum number of
+    words is kept to less than 10,000 because for larger values the tests can
+    become extremely slow.
 
 FOR MORE INFORMATION
 

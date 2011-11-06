@@ -4,8 +4,8 @@ Copyright: (c) 2011, Julian Porter
 License: BSD3
 License-File: LICENSE
 Author: Julian Porter
-Maintainer: 
-Cabal-Version: >= 1.2.3
+Maintainer: Julian Porter
+Cabal-Version: >= 1.6 
 Stability: provisional
 Synopsis: A framework for MapReduce on multicore systems
 Description:
@@ -25,37 +25,48 @@ appropriate monadic function.
 -}
 Category: Distributed Computing
 Build-Type: Simple
-Tested-With: GHC ==6.10 && ==7.0.3
-Extra-source-files:
-other-modules: Control.Monad2, MRCode
+Tested-With: GHC==6.10, GHC==7.0.3
+
+source-repository head
+  type:     git
+  location: git://github.com/Julianporter/Haskell-MapReduce.git
 
 Library
-  Build-Depends: base >=4,
+  Build-Depends: base >=4  && <5,
                  haskell98, deepseq, parallel, bytestring, transformers, pureMD5, ghc-binary
-  GHC-Options: -O2
+  GHC-Options: 
   Hs-Source-Dirs: src
   Exposed-Modules: Process.MapReduce.Multicore, 
-                   Control.Monad2,Control.Monad2.Trans.MapReduce
+                   Control.Monad2,
+                   Control.Monad2.Trans.MapReduce,
+                   Process.MapReduce.WordCount,
+                   Process.MapReduce.WordCount.Tests,
+                   Process.MapReduce.WordCount.Documents
   Exposed: True
   Other-Modules: Process.Common.ParallelMap
-
   Extensions: TypeSynonymInstances,MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances
 
 
 Executable wordcount
-  Main-Is:        Main.hs
+  Main-Is:        WordCount.hs
   Other modules:  Process.MapReduce.Multicore
-  Build-Depends:  base >=4, haskell98
-  GHC-Options: -threaded -O2
+  Build-Depends:  base >=4 && <5, haskell98
+  GHC-Options: -threaded
   Hs-Source-Dirs: src
-  other-modules:  MRCode
+  other-modules:  Process.MapReduce.WordCount, 
+                  Process.MapReduce.Multicore,
+                  Process.Common.ParallelMap
 
-Executable wordgen
-  Main-Is:        Words.hs
-  Build-Depends:  base >=4, 
-                  haskell98, QuickCheck
-  GHC-Options: -threaded -O2
+Executable testwordcount
+  Main-Is:        Main.hs
+  Build-Depends:  base >=4 && <5, haskell98, QuickCheck
+  GHC-Options: -threaded
   Hs-Source-Dirs: src
-  other-modules:  MRCode
+  other-modules:  Process.MapReduce.WordCount,
+                  Process.MapReduce.WordCount.Tests, 
+                  Process.MapReduce.WordCount.Documents,
+                  Process.MapReduce.Multicore,
+                  Process.Common.ParallelMap
+
 
 
