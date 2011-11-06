@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | Functions to make test dictionaries and messages.  The key function
 --   is 'makeWords' which take as arguments a tuple @(nWords,nVocab)@ where
 --   @nWords@ is the desired number of words and @nVocab@ is the size of the

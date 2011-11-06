@@ -9,8 +9,7 @@ Cabal-Version: >= 1.6
 Stability: provisional
 Synopsis: A framework for MapReduce on multicore systems
 Description:
-{-
-Library that defines the 'MapReduce' monad for multicore systems, and exports 
+{- A library that defines the 'MapReduce' monad for multicore systems, and exports 
 the necessary functions.
 
 Mapper / reducers are generalised to functions of type 
@@ -21,13 +20,13 @@ operation.  The resulting monad is executed on initial data by invoking
 For programmers only wishing to write conventional map / reduce algorithms,
 which use functions of type @([s] -> [(s',b)])@ a wrapper function
 'wrapMR' is provided, which converts such a function into the
-appropriate monadic function.
--}
+appropriate monadic function.-}
+
 Category: Distributed Computing
 Build-Type: Simple
 Tested-With: GHC==6.10, GHC==7.0.3, GHC==7.2.1
 
-source-repository head
+Source-repository head
   type:     git
   location: git://github.com/Julianporter/Haskell-MapReduce.git
 
@@ -44,16 +43,16 @@ Library
                    Process.MapReduce.WordCount.Documents
   Exposed: True
   Other-Modules: Process.Common.ParallelMap
-  Extensions: TypeSynonymInstances,MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances
+  Extensions:      MultiParamTypeClasses,  
+                   FlexibleInstances
 
 
 Executable wordcount
   Main-Is:        WordCount.hs
-  Other modules:  Process.MapReduce.Multicore
   Build-Depends:  base >=4 && <5
   GHC-Options: -threaded
   Hs-Source-Dirs: src
-  other-modules:  Process.MapReduce.WordCount, 
+  Other-modules:  Process.MapReduce.WordCount, 
                   Process.MapReduce.Multicore,
                   Process.Common.ParallelMap
 
@@ -62,7 +61,7 @@ Executable testwordcount
   Build-Depends:  base >=4 && <5, QuickCheck
   GHC-Options: -threaded
   Hs-Source-Dirs: src
-  other-modules:  Process.MapReduce.WordCount,
+  Other-modules:  Process.MapReduce.WordCount,
                   Process.MapReduce.WordCount.Tests, 
                   Process.MapReduce.WordCount.Documents,
                   Process.MapReduce.Multicore,
