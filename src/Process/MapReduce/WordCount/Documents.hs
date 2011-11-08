@@ -5,34 +5,12 @@
 --   upper-case letters  provided by 'makeWord': one could plug in a pre-existing 
 --   if that were felt necessary.
 module Process.MapReduce.WordCount.Documents (
--- * Types
-        BoundedInt,get,
--- * Functions
         makeDictionary,makeSequence,makeWords
         ) where
 
-import Test.QuickCheck(Gen,Arbitrary,arbitrary,choose)
+import Test.QuickCheck(Gen,choose)
 import Control.Monad (liftM2)
 
--- | Type used to generate tests sets of reasonably small size (as the tests
---   can otherwise be very slow).  A very simple wrapper round 'Int'.
-data BoundedInt = I {get :: Int -- ^ Accessor function to unwrap the type
-        }
-        deriving (Eq,Ord,Show)
-
--- | Declare 'BoundedInt' an instance of 'Bounded' to set the bounds. 'minBound'
---   must be positive, and if 'maxBound' is too large, the tests will be very slow.
-instance Bounded BoundedInt where
-        minBound = I 10         
-        maxBound = I 10000
-
-
--- | The generator instance that produces test sets consisting of random pairs of 
---   'BoundedInt's.
-instance Arbitrary BoundedInt where
-        arbitrary = do
-                x <- choose (get minBound,get maxBound)
-                return $ I x
                 
 -- | Produce a string of upper-case characters of random length between 2 and 10.
 makeWord :: Gen String
@@ -60,10 +38,10 @@ makeSequence m n = liftM2 (:) (choose (0,m-1)) $ makeSequence m (n-1)
 
 -- | Make a list of a specified number of random words drawn from a dictionary of 
 --   at most a specified size.        
-makeWords :: (BoundedInt,BoundedInt)  -- ^ @(nWords,maxVocab)@ where @nWords@ is the number of words
+makeWords :: Int -> Int  -- ^ @(nWords,maxVocab)@ where @nWords@ is the number of words
                         --   required, and @maxVocab@ is the maximum vocabulary size 
         -> Gen [String] -- ^ The message wrapped in 'Gen'
-makeWords (I n,I m) = if (n<=0) || (m <=0) 
+makeWords n m = if (n<=0) || (m <=0) 
                 then return []
                 else do
                         dict <- makeDictionary m

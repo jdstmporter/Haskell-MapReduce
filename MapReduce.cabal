@@ -22,9 +22,10 @@ which use functions of type @([s] -> [(s',b)])@ a wrapper function
 'wrapMR' is provided, which converts such a function into the
 appropriate monadic function.-}
 
-Category: Distributed Computing
+Category: Concurrency
 Build-Type: Simple
 Tested-With: GHC==6.10, GHC==7.0.3, GHC==7.2.1
+Extra-Source-Files: README
 
 Source-repository head
   type:     git
