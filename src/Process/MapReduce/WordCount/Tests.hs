@@ -14,8 +14,33 @@ module Process.MapReduce.WordCount.Tests (
 
 import Test.QuickCheck
 import Process.MapReduce.WordCount(mapReduce)
-import Process.MapReduce.WordCount.Documents(BoundedInt,get,makeWords)
+import Process.MapReduce.WordCount.Documents(makeWords)
 
+-- | Data type for specifying a test case; simply a pair of 'Int' values,
+--   one for the dictionary size, the other for the document length.  Have
+--   chosen to do it this way, rather than using a @'Positive' 'Int'@ to
+--   simplify application code.  
+data Pair = P Int Int
+        deriving (Show)
+
+-- | Generator for a 'Pair', with the positivity constraint built in.
+instance Arbitrary Pair where
+        arbitrary = do
+                x <- choose (1,maxBound::Int)  
+                y <- choose (1,maxBound::Int)
+                return $ P x y
+
+-- | Utility function to reduce a 'Pair' modulo some 'Int'
+shrinkIt :: Int         -- ^ the base to reduce modulo
+        -> Pair         -- ^ the pair to reduce
+        -> Pair
+shrinkIt b (P n m) = P (r n b) (r m b)
+        where 
+        r x b = 1 + (x `rem` b)
+
+-- #####################################################################
+-- THE TESTS: TEST 1
+-- #####################################################################
 
 -- | Given a @[('String','Int')]@ of counts from 'mapReduce' compute the
 --   total count, which is the sum of all the 'Int' values.
@@ -26,13 +51,18 @@ countWords = foldr ((+).snd) 0
 -- | Simple test that 'mapReduce' returns the correct total number of words,
 --   that is that the sum of all of its counts equals the total number of
 --   words it was given.
-prop_Equal :: (BoundedInt,BoundedInt)    -- ^ The proposed test set
+prop_Equal :: Int       -- ^ The upper bound on test size 
+        -> Pair         -- ^ The proposed test set
         -> Property     -- ^ Whether the test passed
-prop_Equal nm = forAll (makeWords nm) $ 
-        \words -> countWords (mapReduce 16 words) == get ( fst nm)
+prop_Equal b p = forAll (makeWords n m) $ \words -> 
+        countWords (mapReduce 16 words) == n
         where 
-        types = nm::(BoundedInt,BoundedInt)
-
+        P n m = shrinkIt b p
+        
+-- #####################################################################
+-- THE TESTS: TEST 2
+-- #####################################################################
+        
 -- | Count the number of times a given value appears in a list.
 countIn :: (Eq a) => a  -- ^ The value
         -> [a]          -- ^ The list
@@ -68,9 +98,10 @@ testCount ss cs = compare (makeCounts ss) cs
         
 -- | More complex test to verify the counts 'mapReduce' produces on a word-by-word
 --   basis.  
-prop_FullCheck :: (BoundedInt,BoundedInt)    -- ^ The proposed test set
+prop_FullCheck :: Int   -- ^ The upper bound on test size 
+        -> Pair         -- ^ The proposed test set
         -> Property     -- ^ Whether the test passed
-prop_FullCheck nm = forAll (makeWords nm) $ \words -> 
+prop_FullCheck b p = forAll (makeWords n m) $ \words -> 
         testCount words (mapReduce 16 words)
         where 
-        types = nm::(BoundedInt,BoundedInt)   
+        P n m = shrinkIt b p  
