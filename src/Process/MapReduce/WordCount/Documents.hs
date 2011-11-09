@@ -8,7 +8,7 @@ module Process.MapReduce.WordCount.Documents (
         makeDictionary,makeSequence,makeWords
         ) where
 
-import Test.QuickCheck(Gen,choose)
+import Test.QuickCheck(Gen,Positive,choose)
 import Control.Monad (liftM2)
 
                 
@@ -38,12 +38,18 @@ makeSequence m n = liftM2 (:) (choose (0,m-1)) $ makeSequence m (n-1)
 
 -- | Make a list of a specified number of random words drawn from a dictionary of 
 --   at most a specified size.        
-makeWords :: Int -> Int  -- ^ @(nWords,maxVocab)@ where @nWords@ is the number of words
-                        --   required, and @maxVocab@ is the maximum vocabulary size 
-        -> Gen [String] -- ^ The message wrapped in 'Gen'
-makeWords n m = if (n<=0) || (m <=0) 
+makeWords :: Positive Int       -- ^ The number of words to generate
+        -> Positive Int         --   The maximum vocabulary size                          
+        -> Gen [String]         -- ^ The word list wrapped in 'Gen'
+makeWords n m = if 
+        (n<=0) || (m <=0) 
                 then return []
                 else do
-                        dict <- makeDictionary m
-                        seq <- makeSequence m n
+                        -- This is important: 'makeDictionary' and 'makeSequence' must be 
+                        -- able to take 0 as an argument
+                        let m' = fromIntegral m 
+                        let n' = fromIntegral n
+                        dict <- makeDictionary m' 
+                        seq <- makeSequence m' n'
                         return $ map (\i -> dict!!i) seq
+                        

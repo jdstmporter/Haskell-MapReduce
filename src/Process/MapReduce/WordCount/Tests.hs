@@ -16,27 +16,16 @@ import Test.QuickCheck
 import Process.MapReduce.WordCount(mapReduce)
 import Process.MapReduce.WordCount.Documents(makeWords)
 
--- | Data type for specifying a test case; simply a pair of 'Int' values,
---   one for the dictionary size, the other for the document length.  Have
---   chosen to do it this way, rather than using a @'Positive' 'Int'@ to
---   simplify application code.  
-data Pair = P Int Int
-        deriving (Show)
 
--- | Generator for a 'Pair', with the positivity constraint built in.
-instance Arbitrary Pair where
-        arbitrary = do
-                x <- choose (1,maxBound::Int)  
-                y <- choose (1,maxBound::Int)
-                return $ P x y
-
--- | Utility function to reduce a 'Pair' modulo some 'Int'
-shrinkIt :: Int         -- ^ the base to reduce modulo
-        -> Pair         -- ^ the pair to reduce
-        -> Pair
-shrinkIt b (P n m) = P (r n b) (r m b)
+-- | Utility function to reduce a @('Positive' 'Int','Positive' 'Int')@ modulo 
+--   some @'Positive' 'Int'@
+shrinkIt :: Positive Int                       -- ^ the base to reduce modulo
+        -> (Positive Int,Positive Int)         -- ^ the pair to reduce
+        -> (Positive Int,Positive Int)
+shrinkIt b (n,m) = (n `rem1` b, m `rem1` b)
         where 
-        r x b = 1 + (x `rem` b)
+        rem1 x b = 1 + (x `rem` b)
+        
 
 -- #####################################################################
 -- THE TESTS: TEST 1
@@ -51,13 +40,13 @@ countWords = foldr ((+).snd) 0
 -- | Simple test that 'mapReduce' returns the correct total number of words,
 --   that is that the sum of all of its counts equals the total number of
 --   words it was given.
-prop_Equal :: Int       -- ^ The upper bound on test size 
-        -> Pair         -- ^ The proposed test set
-        -> Property     -- ^ Whether the test passed
+prop_Equal :: Positive Int              -- ^ The upper bound on test size 
+        -> (Positive Int,Positive Int)  -- ^ The proposed test set
+        -> Property                     -- ^ Whether the test passed
 prop_Equal b p = forAll (makeWords n m) $ \words -> 
-        countWords (mapReduce 16 words) == n
+        countWords (mapReduce 16 words) == fromIntegral n
         where 
-        P n m = shrinkIt b p
+        (n,m) = shrinkIt b p
         
 -- #####################################################################
 -- THE TESTS: TEST 2
@@ -98,10 +87,10 @@ testCount ss cs = compare (makeCounts ss) cs
         
 -- | More complex test to verify the counts 'mapReduce' produces on a word-by-word
 --   basis.  
-prop_FullCheck :: Int   -- ^ The upper bound on test size 
-        -> Pair         -- ^ The proposed test set
-        -> Property     -- ^ Whether the test passed
+prop_FullCheck :: Positive Int          -- ^ The upper bound on test size 
+        -> (Positive Int,Positive Int)  -- ^ The proposed test set
+        -> Property                     -- ^ Whether the test passed
 prop_FullCheck b p = forAll (makeWords n m) $ \words -> 
         testCount words (mapReduce 16 words)
         where 
-        P n m = shrinkIt b p  
+        (n,m) = shrinkIt b p  
