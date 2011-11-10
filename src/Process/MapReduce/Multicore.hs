@@ -27,10 +27,17 @@ import Control.Monad (liftM)
 import Control.DeepSeq (NFData)
 import System.IO
 import Prelude hiding (return,(>>=))
-import qualified Process.Common.ParallelMap as P
 import Data.Digest.Pure.MD5
 import Data.Binary
 import qualified Data.ByteString.Lazy as B
+import Control.Parallel.Strategies (parMap, rdeepseq)
+
+-- | The parallel map function; it must be functionally identical to 'map',
+--   distributing the computation across all available nodes in some way.
+pMap :: (NFData b) => (a -> b)  -- ^ The function to apply
+        -> [a]                  -- ^ Input 
+        -> [b]                  -- ^ output                                                    
+pMap = parMap rdeepseq
 
 -- | Generalised version of 'Monad' which depends on a pair of 'Tuple's, both
 --   of which change when '>>=' is applied.           
@@ -61,6 +68,7 @@ class MonadG m where
 --  Its structure is intentionally opaque to application programmers.
 newtype MapReduce s a s' b = MR { runMR :: [(s,a)] -> [(s',b)] }
 
+-- | Make MapReduce into a 'MonadG' instance
 instance MonadG MapReduce where
         return = retMR
         (>>=)  = bindMR
@@ -85,7 +93,7 @@ bindMR f g = MR (\s ->
                 fs = runMR f s
                 gs = map g $ nub $ snd <$> fs
         in
-        concat $ P.map (`runMR` fs) gs)
+        concat $ pMap (`runMR` fs) gs)
 
 -- | Execute a MapReduce MonadG given specified initial data.  Therefore, given
 --   a 'MapReduce' @m@ and initial data @xs@ we apply the processing represented
@@ -95,21 +103,21 @@ bindMR f g = MR (\s ->
 runMapReduce :: MapReduce s () s' b     -- ^ 'MapReduce' representing the required processing
                 -> [s]                  -- ^ Initial data
                 -> [(s',b)]             -- ^ Result of applying the processing to the data
-                                                      
 runMapReduce m ss = runMR m [(s,()) | s <- ss]
 
 -- | The hash function.  Computes the MD5 hash of any 'Hashable' type
-hash :: (Binary s) => s -> Int -- ^ computes the hash
+hash :: (Binary s) => s         -- ^ The value to hash
+        -> Int                  -- ^ its hash
 hash s = sum $ map fromIntegral (B.unpack h) 
         where
-        h = encode $ show (md5 $ encode s)
+        h = encode (md5 $ encode s)
 
 -- | Function used at the start of processing to determine how many threads of processing
 --   to use.  Should be used as the starting point for building a 'MapReduce'.
 --   Therefore a generic 'MapReduce' should look like
 --
---   @distributeMR >>= f1 >>= . . . >>= fn@
-distributeMR :: (Binary s) => Int     -- ^ Number of threads across which to distribute initial data 
+--   @'distributeMR' '>>=' f1 '>>=' . . . '>>=' fn@
+distributeMR :: (Binary s) => Int       -- ^ Number of threads across which to distribute initial data 
                 -> MapReduce s () s Int -- ^ The 'MapReduce' required to do this  
 distributeMR n = MR (\ss -> [(s,hash s `mod` n) | s <- fst <$> ss])
 
@@ -121,14 +129,13 @@ distributeMR n = MR (\ss -> [(s,hash s `mod` n) | s <- fst <$> ss])
 --   Therefore the generic 'MapReduce' using only traditional mappers and
 --   reducers should look like
 --
---   @distributeMR >>= liftMR f1 >>= . . . >>= liftMR fn@  
+--   @'distributeMR' '>>=' 'liftMR' f1 '>>=' . . . '>>=' 'liftMR' fn@  
 liftMR :: (Eq a) => ([s] -> [(s',b)])   -- traditional mapper / reducer of signature
-                                        --  @([s] -> [(s',b])@
-        -> a -> MapReduce s a s' b      -- the mapper / reducer wrapped as an instance
+                                        --  @([s] -> [(s',b)]@
+        -> a                            -- the input key 
+        -> MapReduce s a s' b           -- the mapper / reducer wrapped as an instance
                                         -- of 'MapReduce'
-liftMR f = MR . g
-        where
-        g k ss = f $ fst <$> filter (\s -> k == snd s) ss
+liftMR f k = MR (\ss -> f $ fst <$> filter (\s -> k == snd s) ss)
 
 
 

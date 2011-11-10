@@ -1,72 +1,63 @@
-Name: MapReduce
-Version: 0.2
-Copyright: (c) 2011, Julian Porter
-License: BSD3
-License-File: LICENSE
-Author: Julian Porter
-Maintainer: Julian Porter
-Cabal-Version: >= 1.6 
-Stability: provisional
-Synopsis: A framework for MapReduce on multicore systems
-Description:
-{- A library that defines the 'MapReduce' monad for multicore systems, and exports 
-the necessary functions.
+name:                MapReduce
+version:             0.2
+copyright:           (c) 2011, Julian Porter
+license:             BSD3
+license-file:        LICENSE
+author:              Julian Porter
+maintainer:          Julian Porter
+cabal-version:       >= 1.6
+stability:           provisional
+synopsis:            A framework for MapReduce on multicore systems
+description:         null
+category:            Concurrency
+build-type:          Simple
+tested-with:         GHC==6.10, GHC==7.0.3, GHC==7.2.1
+extra-source-files:  README
 
-Mapper / reducers are generalised to functions of type 
-@a -> ([(s,a)] -> [(s',b)])@ which are combined using the monad's bind 
-operation.  The resulting monad is executed on initial data by invoking
-'runMapReduce'.
+source-repository head
+  type:      git
+  location:  git://github.com/Julianporter/Haskell-MapReduce.git
 
-For programmers only wishing to write conventional map / reduce algorithms,
-which use functions of type @([s] -> [(s',b)])@ a wrapper function
-'wrapMR' is provided, which converts such a function into the
-appropriate monadic function.-}
+library
+  build-depends:    base >=4  && <5
+  ghc-options:      null
+  hs-source-dirs:   src
+  exposed-modules:  Process.MapReduce.Multicore,
+                    Process.MapReduce.WordCount,
+                    Process.MapReduce.WordCount.Tests,
+                    Process.MapReduce.WordCount.Documents
+                    Control.Monad2,
+                    Control.Monad2.Trans.MapReduce
+  exposed:          True
+  extensions:       MultiParamTypeClasses,
+                    FlexibleInstances
 
-Category: Concurrency
-Build-Type: Simple
-Tested-With: GHC==6.10, GHC==7.0.3, GHC==7.2.1
-Extra-Source-Files: README
+executable wordcount
+  main-is:         WordCount.hs
+  build-depends:   base >=4 && <5
+  ghc-options:     -threaded
+  hs-source-dirs:  src
+  other-modules:   Process.MapReduce.WordCount,
+                   Process.MapReduce.Multicore
 
-Source-repository head
-  type:     git
-  location: git://github.com/Julianporter/Haskell-MapReduce.git
-
-Library
-  Build-Depends: base >=4  && <5,
-                 deepseq, parallel, bytestring, transformers, pureMD5, binary
-  GHC-Options: 
-  Hs-Source-Dirs: src
-  Exposed-Modules: Process.MapReduce.Multicore, 
-                   Control.Monad2,
-                   Control.Monad2.Trans.MapReduce,
-                   Process.MapReduce.WordCount,
+executable testwordcount
+  main-is:         Main.hs
+  build-depends:   base >=4 && <5, QuickCheck
+  ghc-options:     -threaded
+  hs-source-dirs:  src
+  other-modules:   Process.MapReduce.WordCount,
                    Process.MapReduce.WordCount.Tests,
-                   Process.MapReduce.WordCount.Documents
-  Exposed: True
-  Other-Modules: Process.Common.ParallelMap
-  Extensions:      MultiParamTypeClasses,  
-                   FlexibleInstances
+                   Process.MapReduce.WordCount.Documents,
+                   Process.MapReduce.Multicore
 
-
-Executable wordcount
-  Main-Is:        WordCount.hs
-  Build-Depends:  base >=4 && <5
-  GHC-Options: -threaded
-  Hs-Source-Dirs: src
-  Other-modules:  Process.MapReduce.WordCount, 
-                  Process.MapReduce.Multicore,
-                  Process.Common.ParallelMap
-
-Executable testwordcount
-  Main-Is:        Main.hs
-  Build-Depends:  base >=4 && <5, QuickCheck
-  GHC-Options: -threaded
-  Hs-Source-Dirs: src
-  Other-modules:  Process.MapReduce.WordCount,
-                  Process.MapReduce.WordCount.Tests, 
-                  Process.MapReduce.WordCount.Documents,
-                  Process.MapReduce.Multicore,
-                  Process.Common.ParallelMap
-
-
+test-suite testwordcount
+  type:            detailed-0.9
+  build-depends:   base >= 4
+  hs-source-dirs:  src
+  ghc-options:     -threaded
+  other-modules:   Main, 
+                   Process.MapReduce.Multicore, 
+                   Process.MapReduce.WordCount, 
+                   Process.MapReduce.WordCount.Documents, 
+                   Process.MapReduce.WordCount.Tests
 
