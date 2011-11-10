@@ -13,6 +13,8 @@ import Control.Monad (liftM2)
 
                 
 -- | Produce a string of upper-case characters of random length between 2 and 10.
+--   The resulting string is wrapped in 'Gen' because (for simplicity) the entropy
+--   source is 'choose'.
 makeWord :: Gen String
 makeWord = do
         n <- choose(2,10)::Gen Int

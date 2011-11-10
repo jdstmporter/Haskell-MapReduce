@@ -54,7 +54,7 @@ import Control.Monad2
 -- | The 'MapReduceT' type.  Wraps a function @('Monad' m) => (m a -> m b)@.
 data (Monad m) => MapReduceT m a b = MR { run :: m a -> m b }
 
--- | Lift a function into 'MapReduceT'.
+-- | Utility function to lift a function @m a -> m b@ into 'MapReduceT'.
 mr :: (Monad m) => (m a -> m b) -- ^ the function to lift 
         -> MapReduceT m a b     -- ^ the resulting 'MapReduceT m a b' instance
 mr = MR 

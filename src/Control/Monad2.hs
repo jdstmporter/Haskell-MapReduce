@@ -48,5 +48,6 @@ class MonadTrans2 t where
         lift :: (Monad m) => m a -> t m a a  
 
 -- | If @t@ is a 'MonadTrans2' and @m@ is a 'Monad' then @t m@ must be a 'Monad2'.
--- This constraint forces implementers of 'MonadTrans2' to provide the monadic functions.
+--   The instance implementation is deliberately left empty.  This forces 
+--   implementers of 'MonadTrans2' to provide the monadic functions.
 instance (Monad m,MonadTrans2 t) => Monad2 (t m) a b
