@@ -7,14 +7,16 @@ import System.Environment (getArgs)
 import Test.QuickCheck (Property,Result (Failure),Positive,quickCheckResult)
 import Process.MapReduce.WordCount.Tests (prop_Equal,prop_FullCheck)
 
-applyTest :: ((Positive Int,Positive Int) -> Property) -> IO Int
+-- | simple function to apply a test and return non-zero if it fails
+applyTest :: ((Positive Int,Positive Int) -> Property)  -- ^ the test
+        -> IO Int                                       -- ^ the result
 applyTest f = do
         r <- quickCheckResult f
         case r of
                 Failure _ _ _ _ _ _ _ -> return 1
                 _ -> return 0
  
--- Apply some tests to wordcount
+-- Apply some tests to wordcount; returns non-zero on failure
 main::IO Int
 main  = do
         b <- do
