@@ -41,7 +41,8 @@ module Control.Monad2.Trans.MapReduce (
         lift,       
 -- * Other functions
         bind,      
-        mr          
+        mr,
+        (-<)          
         )
 where
 
@@ -58,6 +59,12 @@ data (Monad m) => MapReduceT m a b = MR { run :: m a -> m b }
 mr :: (Monad m) => (m a -> m b) -- ^ the function to lift 
         -> MapReduceT m a b     -- ^ the resulting 'MapReduceT m a b' instance
 mr = MR 
+
+-- | Apply a 'MapReduceT' to input data and return the output
+(-<) :: (Monad m) => MapReduceT m a b   -- ^ The 'MapReduceT' to apply
+        -> m a                          -- ^ The data to apply it to
+        -> m b                          -- ^ The output
+(-<) =run 
 
 -- | 'MapReduceT' is a 'Category' with 
 --

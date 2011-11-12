@@ -4,16 +4,17 @@ module Parallel.MapReduce.WordCount (
         mapReduce
         ) where
 
-import Parallel.MapReduce.Multicore
+--import Parallel.MapReduce.Multicore
+import Parallel.MapReduce (run,distribute,lift,(>>=))
 import Prelude hiding (return,(>>=))
 
 -- | Perform MapReduce on a list of words, returning word / count pairs
 mapReduce :: Int                -- ^ The number of mappers to use on the first stage
         -> [String]             -- ^ The list of words to count    
         -> [(String,Int)]       -- ^ The list of word / count pairs
-mapReduce n state = runMapReduce mr state
+mapReduce n state = run mr state
         where
-        mr = distributeMR n >>= liftMR mapper >>= liftMR reducer 
+        mr = distribute n >>= lift mapper >>= lift reducer 
 
 -- transformers
 
