@@ -91,8 +91,8 @@ bind :: (Monad m) => MapReduceT m b b   -- ^ The projection operator, should be 
         -> MapReduceT m a c
 bind p f g = MR (\ x -> left x P.>>= right x)
                 where
-                left x = (f >>> p) `run` x
-                right x y = (f >>> g y) `run` x
+                left x = (f >>> p) -< x
+                right x y = (f >>> g y) -< x
 
 
 -- | Make 'MapReduceT' a 'Monad2'
