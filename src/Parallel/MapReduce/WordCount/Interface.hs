@@ -13,8 +13,9 @@ module Parallel.MapReduce.WordCount.Interface
 -- * Types
          ATest,
 -- * Utilities         
-         applyTest,     
-         name   
+         applyTest,
+         applyTestInt,     
+         name
         ) where
 
 import Distribution.TestSuite
@@ -66,4 +67,18 @@ applyTest t b = do
         r <- quickCheckResult (test t b)
         case r of
                 Q.Failure _ _ _ _ _ _ _ -> return $ Fail (name t) 
-                _ -> return Pass         
+                _ -> return Pass 
+
+-- | wrapper round 'applyTest' to return an @'IO' 'Int'@ which is non-zero if
+--   any test fails.
+applyTestInt :: ATest                             -- ^ test to apply
+        -> Positive Int                           -- ^ bound on test size
+        -> IO Int                                 -- ^ the result
+applyTestInt t b = do
+        r <- applyTest t b
+        if r == Pass 
+                then return 1
+                else return 0
+
+                
+                

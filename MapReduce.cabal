@@ -87,7 +87,7 @@ Executable testwordcount
 
 test-suite wordcounttest
   type:            exitcode-stdio-1.0
-  Main-Is:         Interface.hs
+  main-is:         Main.hs
   build-depends:   base >=4 && <5,
                    parallel >= 3.2,
                    deepseq >= 1.2,
@@ -97,9 +97,8 @@ test-suite wordcounttest
                    QuickCheck >= 2.4.1.1,
                    Cabal >= 1.12
   hs-source-dirs:  src
-  ghc-options:     -threaded
   Extensions:      FlexibleInstances, MultiParamTypeClasses
   other-modules:   Parallel.MapReduce.WordCount, 
                    Parallel.MapReduce.WordCount.Documents,
-                   Parallel.MapReduce.WordCount.Tests
-  Extensions:      FlexibleInstances
+                   Parallel.MapReduce.WordCount.Tests,
+                   Parallel.MapReduce.WordCount.Interface
