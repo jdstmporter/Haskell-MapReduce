@@ -11,7 +11,7 @@
 --   which use functions of type @([s] -> [(s',b)])@ a wrapper function
 --   'liftMR' is provided, which converts such a function into the
 --   appropriate monadic function. 
-module Process.MapReduce.Multicore (
+module Parallel.MapReduce.Multicore (
 -- * Types
         MapReduce, 
 -- * Functions

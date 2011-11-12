@@ -1,10 +1,10 @@
 -- | Module that uses "Process.MapReduce.Multicore" to implement
 --   the standard Mapreduce wordcount algorithm.
-module Process.MapReduce.WordCount (
+module Parallel.MapReduce.WordCount (
         mapReduce
         ) where
 
-import Process.MapReduce.Multicore
+import Parallel.MapReduce.Multicore
 import Prelude hiding (return,(>>=))
 
 -- | Perform MapReduce on a list of words, returning word / count pairs

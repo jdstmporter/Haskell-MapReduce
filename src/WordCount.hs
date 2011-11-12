@@ -11,7 +11,7 @@ module Main where
 
 import System.IO
 import System.Environment (getArgs)
-import Process.MapReduce.WordCount
+import Parallel.MapReduce.WordCount
 
 showNice :: [(String,Int)] -> IO()
 showNice [] = return ()

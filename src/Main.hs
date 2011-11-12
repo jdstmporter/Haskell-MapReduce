@@ -5,19 +5,13 @@ module Main where
 import System.IO
 import System.Environment (getArgs)
 import Test.QuickCheck (Property,Result (Failure),Positive,quickCheckResult)
-import Process.MapReduce.WordCount.Tests (prop_Equal,prop_FullCheck)
+import Control.Monad(mapM_,when)
+import Parallel.MapReduce.WordCount.Interface
 
--- | simple function to apply a test and return non-zero if it fails
-applyTest :: ((Positive Int,Positive Int) -> Property)  -- ^ the test
-        -> IO Int                                       -- ^ the result
-applyTest f = do
-        r <- quickCheckResult f
-        case r of
-                Failure _ _ _ _ _ _ _ -> return 1
-                _ -> return 0
+
  
 -- Apply some tests to wordcount; returns non-zero on failure
-main::IO Int
+main::IO ()
 main  = do
         b <- do
                 a <- getArgs
@@ -25,10 +19,5 @@ main  = do
                         then return $ read (head a)
                         else return 10000      
         putStrLn $ "Testing the word-count MapReduce algorithm with size bound " ++ show (fromIntegral b)
-        putStrLn "WARNING: Can be very slow if bound > 10000"          
-        putStrLn "Total count test (coarse-grained): " 
-        r1 <- applyTest (prop_Equal b)
-        putStrLn "Detailed test (fine-grained): "
-        r2 <- applyTest (prop_FullCheck b)
-        return $ r1 + r2 
-        
+        when (b > 10000) $ putStrLn "WARNING: Can be very slow if bound > 10000" 
+        mapM_ (\t -> putStrLn (name t ++ ": ") >> applyTest t b) tests

@@ -7,14 +7,14 @@
 --
 --    [prop_fullCheck] A test which uses MapReduce to do wordcount, 
 --    then compares its results from another, more elementary algorithm
-module Process.MapReduce.WordCount.Tests (
+module Parallel.MapReduce.WordCount.Tests (
         prop_Equal,
         prop_FullCheck
         ) where
 
 import Test.QuickCheck
-import Process.MapReduce.WordCount(mapReduce)
-import Process.MapReduce.WordCount.Documents(makeWords)
+import Parallel.MapReduce.WordCount(mapReduce)
+import Parallel.MapReduce.WordCount.Documents(makeWords)
 
 
 -- | Utility function to reduce a @('Positive' 'Int','Positive' 'Int')@ modulo 
@@ -25,7 +25,8 @@ shrinkIt :: Positive Int                       -- ^ the base to reduce modulo
 shrinkIt b (n,m) = (n `rem1` b, m `rem1` b)
         where 
         rem1 x b = 1 + (x `rem` b)
-        
+
+       
 
 -- #####################################################################
 -- THE TESTS: TEST 1
@@ -61,7 +62,6 @@ countIn x xs = foldr f 0 xs
         f y n 
                 | x == y = n+1
                 | otherwise = n
-
 -- | Turn a list of strings into @('String','Int')@ pairs giving
 --   the counts of appearances.
 makeCounts :: [String]          -- ^ The input list

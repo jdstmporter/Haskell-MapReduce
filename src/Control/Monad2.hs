@@ -21,7 +21,10 @@
 --
 --   There is also one constraint: 
 --
---   * If @t :: 'MonadTrans2'@ and @m :: 'Monad'@ then @t m :: 'Monad2'@. 
+--   * If @t :: 'MonadTrans2'@ and @m :: 'Monad'@ then @t m :: 'Monad2'@.
+--
+--  /Relation to monads/: note that if 'm' is a 'Monad2' and define @n a = m a a@
+--  and carry across |return| and |>>=| as is, then 'n' is a 'Monad'. 
 module Control.Monad2  (
         Monad2,
         MonadTrans2,
@@ -51,3 +54,5 @@ class MonadTrans2 t where
 --   The instance implementation is deliberately left empty.  This forces 
 --   implementers of 'MonadTrans2' to provide the monadic functions.
 instance (Monad m,MonadTrans2 t) => Monad2 (t m) a b
+
+        

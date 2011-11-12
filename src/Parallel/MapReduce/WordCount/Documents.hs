@@ -4,7 +4,7 @@
 --   vocabulary.  The function uses as words randomly-generated strings of
 --   upper-case letters  provided by 'makeWord': one could plug in a pre-existing 
 --   if that were felt necessary.
-module Process.MapReduce.WordCount.Documents (
+module Parallel.MapReduce.WordCount.Documents (
         makeDictionary,makeSequence,makeWords
         ) where
 
